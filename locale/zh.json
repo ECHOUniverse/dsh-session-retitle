@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "title": "重新生成会话标题",
+    "description": "在会话菜单中增加“重新生成标题”，复用官方 all-prompts 标题 Provider；执行前 fail-closed 预检 Provider、过滤归档会话，并在替换手动标题前弹出阻塞式确认。",
+    "detail": "docs/DETAIL.md"
+  },
+  "ui": {
+    "menu.retitle": "重新生成标题",
+    "toast.refreshed": "已重新生成会话标题：{title}",
+    "toast.noInput": "当前会话没有可用的对话文本，未重新生成标题。",
+    "toast.providerUnavailable": "官方 all-prompts 标题 Provider 不可用，请启用后重试。",
+    "toast.providerUnavailableRecovered": "官方 all-prompts 标题 Provider 不可用，已恢复并保留手动标题“{title}”。",
+    "toast.providerUnavailableFallback": "官方 all-prompts 标题 Provider 不可用，手动标题恢复失败：{reason}。标题仍为自动 fallback“{title}”。",
+    "toast.providerCheckFailed": "无法确认官方标题 Provider 状态，请重试。",
+    "toast.archived": "该会话已归档，未重新生成标题。",
+    "toast.failed": "重新生成标题失败：{reason}",
+    "failure.inputTooLarge": "对话内容超出标题 Provider 的长度上限",
+    "failure.noRoute": "没有可用的模型路由",
+    "failure.invalidOutput": "Provider 返回了无效标题",
+    "failure.timeout": "请求超时",
+    "failure.cancelled": "请求已取消",
+    "failure.superseded": "该请求已被更新的请求取代",
+    "failure.unknown": "发生未知错误",
+    "modal.title": "替换手动标题？",
+    "modal.description": "当前会话使用了手动标题“{title}”。重新生成会替换该标题并解除手动固定。",
+    "modal.consequence": "新标题来自官方 all-prompts 标题 Provider。若生成失败，标题可能回退为自动标题且无法回滚。",
+    "modal.cancel": "保留手动标题",
+    "modal.confirm": "替换标题"
+  }
+}

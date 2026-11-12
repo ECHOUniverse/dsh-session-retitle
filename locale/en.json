@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "title": "Regenerate session title",
+    "description": "Adds a session menu action that regenerates a session title through the official all-prompts title provider, with a fail-closed provider preflight, archive filtering and a blocking confirmation before a manual title is replaced.",
+    "detail": "docs/DETAIL.md"
+  },
+  "ui": {
+    "menu.retitle": "Regenerate title",
+    "toast.refreshed": "Session title regenerated: {title}",
+    "toast.noInput": "This session has no eligible conversation text; the title was not regenerated.",
+    "toast.providerUnavailable": "The official all-prompts title provider is unavailable. Enable it and try again.",
+    "toast.providerUnavailableRecovered": "The official all-prompts title provider is unavailable. Your manual title “{title}” was restored and kept.",
+    "toast.providerUnavailableFallback": "The official all-prompts title provider is unavailable and the manual title could not be restored: {reason}. The title is still the automatic fallback “{title}”.",
+    "toast.providerCheckFailed": "Could not confirm the official title provider. Please try again.",
+    "toast.archived": "This session is archived, so its title was not regenerated.",
+    "toast.failed": "Could not regenerate the title: {reason}",
+    "failure.inputTooLarge": "the conversation text is too long for the title provider",
+    "failure.noRoute": "no model route is available",
+    "failure.invalidOutput": "the provider returned an invalid title",
+    "failure.timeout": "the request timed out",
+    "failure.cancelled": "the request was cancelled",
+    "failure.superseded": "a newer request replaced this one",
+    "failure.unknown": "an unknown error occurred",
+    "modal.title": "Replace the manual title?",
+    "modal.description": "This session has the manual title “{title}”. Regenerating replaces it and unpins the manual title.",
+    "modal.consequence": "The new title comes from the official all-prompts title provider. If generation fails, the title may fall back to an automatic title and cannot be rolled back.",
+    "modal.cancel": "Keep manual title",
+    "modal.confirm": "Replace title"
+  }
+}

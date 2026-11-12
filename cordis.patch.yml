@@ -1,0 +1,14 @@
+# @hanxu131/dsh-session-retitle bundle patch: mounts the session-title
+# regeneration plugin into a DSH profile composition.
+#
+# The Host half registers the strict `sessionRetitle/execute` Remote and a
+# constant, side-effect-free service for the phase-2 spike. The Client half
+# registers the session context-menu action and its Toast feedback.
+#
+# Local install: Plugins > Add plugin (choose this directory) or
+#   dsh plugin --profile <name> add link:/path/to/regeneratetitle-dsh
+- insert:
+    - id: session-retitle
+      # Quoted because `@` is a reserved YAML indicator.
+      name: '@hanxu131/dsh-session-retitle'
+      config: {}

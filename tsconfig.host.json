@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationDir": "lib/types"
+  },
+  "include": [
+    "src/shared/**/*.ts",
+    "src/host/**/*.ts"
+  ]
+}
