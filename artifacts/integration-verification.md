@@ -39,6 +39,12 @@
 - Standards 轴：0 条硬性违规（仓库无成文编码规范）；cleanup 后剩余 judgement-call 已收敛。
 - Spec 轴：3 条真实偏差（手动标题补偿抛错路径、跨会话旧 Toast、竞态实际状态未回显）均已修复并由新增测试锁定；1 条结构偏离（计划中的 contribution.ts/index.tsx/modal.tsx 文件划分）由等价实现承担。
 
+## 当前 Profile 安装状态
+
+- `~/.dsh/profiles/desktop/package.json` 的 bundles 已包含 `@hanxu131/dsh-session-retitle`，依赖为 `link:/Volumes/.../regeneratetitle-dsh`（本地链接安装）。
+- 官方 `@deepseek-ai/dsh-experimental-session-titles-bundle` 同时启用。
+- Desktop 实测基于审查修复前的构建；审查修复（Host 补偿抛错路径、跨会话 Toast、竞态状态回显、Standards 清理）之后已重新构建并通过 73 项测试。运行中的 Desktop 进程仍加载旧 JS 代，**需要重启 Desktop 才能加载最终构建**；重启会结束当前会话，故留待用户执行。
+
 ## 未逐一注入的真实故障
 
 超限、无路由、超时、非法输出、Provider 输出空等由 Host 结构化单测覆盖；未在真实 Provider 上逐一注入。
