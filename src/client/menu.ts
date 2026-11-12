@@ -6,7 +6,9 @@
  * The capability preflight happens after the user selects the action, inside
  * the operation.
  */
-import { LOCALE_NAMESPACE, MENU_ACTION_ID, MENU_CONTRIBUTION_ID, MENU_ORDER } from '../shared/ids.js'
+import {
+  LOCALE_NAMESPACE, MENU_ACTION_ID, MENU_CONTRIBUTION_ID, MENU_ICON_KEY, MENU_ORDER,
+} from '../shared/ids.js'
 import { archiveSources, readMenuVisibility } from './archive.js'
 import { bindTranslator } from './i18n.js'
 import type { RetitleOperation } from './operation.js'
@@ -56,6 +58,9 @@ export function createSessionMenuContribution(
       return [{
         id: MENU_ACTION_ID,
         label: t('menu.retitle'),
+        // The glyph is a keyed `contextMenu.icon` entry registered by the
+        // Client entry, so the row matches the shipped session actions.
+        icon: { key: MENU_ICON_KEY },
         run: () => operation.run(target.sessionId),
       }]
     },

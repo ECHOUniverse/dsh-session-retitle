@@ -19,6 +19,16 @@ export const ROOT_DEPS = ['remote', 'contextMenus', 'locale', 'workspaces', 'slo
 export const DYNAMIC_DEPS = [REMOTE_NAMESPACE_DEP, PLUGIN_INVENTORY_DEP, WORKSPACES_DEP, SLOTS_DEP]
 export const ALL_PROMPTS_ENTRY_ID = 'optional-session-title-all-prompts'
 export const ALL_PROMPTS_MODULE = '@deepseek-ai/dsh-session-title-all-prompts-llm'
+export const PRIMITIVES_MODULE = '@deepseek-ai/dsh-client-ui-primitives'
+
+/**
+ * The page seeds the official UI primitives module in its baseline module
+ * table; Node has no such package, so the artifact's one glyph import is stubbed
+ * here and its identity is asserted by the menu tests.
+ */
+export const primitivesStub = {
+  IconRefreshOutlineRegular: function IconRefreshOutlineRegular() { return null },
+}
 export const MENU_CONTRIBUTION_ID = `${PKG}.session.retitle`
 export const MENU_ACTION_ID = `${PKG}.session.retitle.action`
 export const MODAL_SLOT_ID = 'session-retitle.manual-title-modal'
@@ -27,7 +37,8 @@ let cachedArtifact
 /** Load the built single-file Client artifact through a ModuleLoader stand-in (once). */
 export async function loadClientArtifact() {
   if (cachedArtifact !== undefined) return cachedArtifact
-  const require = createRequire(import.meta.url)
+  const nodeRequire = createRequire(import.meta.url)
+  const require = (specifier) => (specifier === PRIMITIVES_MODULE ? primitivesStub : nodeRequire(specifier))
   let loaded
   globalThis.window ??= {}
   globalThis.window.__ModuleLoader__ = {

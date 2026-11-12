@@ -80,6 +80,13 @@ test('build output: uncompressed ESM host and one ModuleLoader client artifact',
   // The shared strict descriptor is bundled into the single client artifact.
   assert.match(client, /sessionRetitle\/execute/)
   assert.match(client, /agentId/)
-  // Third-party Client plugins must not import Harness Client packages.
-  assert.doesNotMatch(client, /require\((['"])(@deepseek-ai\/dsh-client-|@deepseek-ai\/dsh-api-)/)
+  // Only page baseline module-table modules may be required: a React page
+  // singleton and the seeded UI primitives glyph. Harness Client service
+  // packages are not loadable from a third-party bundle and must stay out.
+  const required = [...new Set([...client.matchAll(/require\((['"])([^'"]+)\1\)/g)].map((match) => match[2]))].sort()
+  assert.deepEqual(required, [
+    '@deepseek-ai/dsh-client-ui-primitives',
+    'react',
+    'react/jsx-runtime',
+  ])
 })

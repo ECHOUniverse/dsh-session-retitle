@@ -16,8 +16,9 @@
  */
 import type { ReactNode } from 'react'
 
-import { LOCALE_NAMESPACE } from '../shared/ids.js'
+import { LOCALE_NAMESPACE, MENU_ICON_KEY } from '../shared/ids.js'
 import { sessionRetitleRemoteInfo } from '../shared/remote.js'
+import { RetitleMenuIcon } from './icon.js'
 import { dictionaries } from './locale.js'
 import { createSessionMenuContribution } from './menu.js'
 import { SessionRetitleModal, type SessionRetitleModalProps } from './overlay.js'
@@ -38,6 +39,8 @@ const SLOTS_DEP = 'slots'
 
 /** Root slot hosting the blocking manual-title Modal. */
 const OVERLAY_SLOT = 'shell.overlay'
+/** Keyed slot the shared menu overlay renders action glyphs from. */
+const ICON_SLOT = 'contextMenu.icon'
 /** Stable overlay entry id. */
 export const MODAL_SLOT_ID = 'session-retitle.manual-title-modal'
 
@@ -79,6 +82,14 @@ function installClientSurface(ctx: ClientInjectedContext): void {
       cancel: () => operation.cancel(),
     }),
   }, SessionRetitleModal as (props: SessionRetitleModalProps) => ReactNode))
+
+  // The row glyph is a keyed `contextMenu.icon` entry: the overlay resolves it
+  // by the action's icon key, and the registration follows this fiber, so
+  // disabling the plugin withdraws the icon together with the action.
+  ctx.slots.inject(ICON_SLOT, () => ctx.slots.register({
+    name: ICON_SLOT,
+    key: MENU_ICON_KEY,
+  }, RetitleMenuIcon))
 
   // Unloading or disabling the plugin aborts every in-flight request and
   // withdraws the Modal before the menu contribution disappears.

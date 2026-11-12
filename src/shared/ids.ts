@@ -23,6 +23,12 @@ export const MENU_CONTRIBUTION_ID = `${PACKAGE_NAME}.session.retitle`
 /** Action id inside the session menu contribution. */
 export const MENU_ACTION_ID = `${PACKAGE_NAME}.session.retitle.action`
 
+/**
+ * Key of the glyph registered in the keyed `contextMenu.icon` Slot.
+ * The action publishes it as `icon.key`; the overlay passes it to renderSlot.
+ */
+export const MENU_ICON_KEY = `${PACKAGE_NAME}.session.retitle.icon`
+
 /** Sort position between Rename (200) and Fork (300). */
 export const MENU_ORDER = 210
 

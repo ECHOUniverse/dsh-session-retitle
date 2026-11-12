@@ -8,8 +8,11 @@ import {
   SLOTS_DEP,
   createHarness,
   loadClientArtifact,
+  primitivesStub,
   resolveMenu,
 } from './client-harness.mjs'
+
+const MENU_ICON_KEY = '@hanxu131/dsh-session-retitle.session.retitle.icon'
 
 const MENU_LABEL = 'Regenerate title'
 
@@ -56,10 +59,10 @@ test('wiring: root services, then mount, then one injected child fiber for menu 
   assert.equal(contribution.order, 210)
 
   // The blocking manual-title Modal is a root overlay entry registered from the
-  // same injected fiber, with its own locale namespace and injected face.
-  assert.equal(harness.state.slotInjections.length, 1)
-  assert.equal(harness.state.slotInjections[0], 'shell.overlay')
-  assert.equal(harness.state.slotRegistrations.length, 1)
+  // same injected fiber, with its own locale namespace and injected face. The
+  // row glyph is a second, keyed slot entry on the same fiber.
+  assert.deepEqual(harness.state.slotInjections, ['shell.overlay', 'contextMenu.icon'])
+  assert.equal(harness.state.slotRegistrations.length, 2)
   const slot = harness.slotRegistration
   assert.equal(slot.options.name, 'shell.overlay')
   assert.equal(slot.options.id, MODAL_SLOT_ID)
@@ -81,6 +84,26 @@ test('menu: label is resolved from the locale on every resolve', async () => {
   harness.setLocaleDict({ 'menu.retitle': 'Titel neu erzeugen' })
   const second = await resolveMenu(harness)
   assert.equal(second.actions[0].label, 'Titel neu erzeugen')
+})
+
+test('menu: the action carries the official refresh glyph on the keyed icon slot', async () => {
+  const harness = createHarness()
+  await applyPlugin(harness)
+
+  const { actions } = await resolveMenu(harness)
+  assert.deepEqual(actions[0].icon, { key: MENU_ICON_KEY })
+
+  const registration = harness.state.slotRegistrations.find(
+    (entry) => entry.options.name === 'contextMenu.icon',
+  )
+  assert.ok(registration !== undefined, 'the action glyph must be registered')
+  assert.deepEqual(registration.options, { name: 'contextMenu.icon', key: MENU_ICON_KEY })
+  assert.ok(registration.injected.includes(SLOTS_DEP), 'the glyph belongs to the injected fiber')
+
+  // The glyph renders the page-baseline product icon, not a hand-drawn SVG;
+  // the shared Menu cell owns the 14px size, so the component takes no size.
+  const element = registration.component({ icon: actions[0].icon })
+  assert.equal(element.type, primitivesStub.IconRefreshOutlineRegular)
 })
 
 test('menu: archived, not-ready and busy workspace states hide the action', async () => {

@@ -26,9 +26,14 @@ await build({
   // The Modal is authored as JSX; the automatic runtime keeps React a page
   // singleton resolved through the external require('/react/jsx-runtime').
   jsx: 'automatic',
-  // React stays a page singleton; no Harness Client package is imported, so
-  // nothing else may leak a require() into the artifact.
-  external: ['react', 'react-dom', 'react/jsx-runtime', 'react-dom/client'],
+  // React stays a page singleton. The official UI primitives package is a
+  // baseline module in the page's static module table (the shell seeds it), so
+  // the artifact must keep its require() instead of bundling a second copy.
+  // No Harness Client service package may leak a require() into the artifact.
+  external: [
+    'react', 'react-dom', 'react/jsx-runtime', 'react-dom/client',
+    '@deepseek-ai/dsh-client-ui-primitives',
+  ],
   outfile: bundlePath,
   legalComments: 'none',
   logLevel: 'warning',

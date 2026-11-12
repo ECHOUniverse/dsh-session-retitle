@@ -5,6 +5,7 @@
 ## 功能
 
 - 会话右键、行尾 … 及同一 session target 的菜单入口，归档会话不显示操作。
+- 菜单项使用官方 UI primitives 的原生刷新图标 `IconRefreshOutlineRegular`，与「重命名」「分叉会话」「归档会话」等条目同风格。
 - 插件自有 sessionRetitle/execute Typert Remote；无斜杠命令、Agent 工具或 command/run/done 事件。
 - 冷会话通过官方 agent lookup 恢复，Provider 每次执行前 fail-closed 预检。
 - 手动标题经阻塞式 Modal 确认，并用 eventSeq 防止覆盖确认期间的新标题。
@@ -49,7 +50,7 @@
 
 - engines.dsh 固定 0.2.2-rc.2。
 - npm 仅发布 protocol 0.2.2-rc.1，因此构建期使用该纯 descriptor 工厂，运行期 Host 由 DSH 0.2.2-rc.2 解析；用户已批准 rc.1 构建 + rc.2 实测策略。
-- 当前 74 项测试通过，阶段 2 的严格 Remote、冷恢复、零副作用与卸载验证已完成，详见 artifacts/spike-verification.md。
+- 当前 75 项测试通过，阶段 2 的严格 Remote、冷恢复、零副作用与卸载验证已完成，详见 artifacts/spike-verification.md。
 - Desktop/真实 Provider 的最终验收记录见 artifacts/（随集成验证更新）。
 
 ## 已知限制

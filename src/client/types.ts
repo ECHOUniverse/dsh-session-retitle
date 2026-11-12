@@ -1,10 +1,13 @@
 /**
  * Structural contracts for the official Client services this plugin consumes.
  *
- * The plugin must not import Harness Client packages (they are page singletons
- * and not resolvable from a third-party bundle), so each seam is typed as the
- * minimal slice actually read. Wire types still come from the shared Remote
- * definition; nothing here restates the wire contract.
+ * The plugin must not import Harness Client service packages: they are page
+ * singletons owned by other plugins, so each such seam is typed as the minimal
+ * slice actually read. The page baseline module table is different — its UI
+ * primitives (for example @deepseek-ai/dsh-client-ui-primitives) are shared
+ * modules served by the page, add no dependency, and are allowed; they are
+ * typed by a local ambient declaration instead. Wire types still come from the
+ * shared Remote definition; nothing here restates the wire contract.
  */
 import type { ReactNode } from 'react'
 
@@ -76,10 +79,20 @@ export interface SessionMenuTarget {
   readonly displayTitle: string
 }
 
+/** Keyed glyph metadata captured with one menu action. */
+export interface SessionMenuIcon {
+  /** Key of the registration in the keyed `contextMenu.icon` Slot. */
+  readonly key: string
+  /** Optional image URL instead of a slot glyph; unused by this plugin. */
+  readonly src?: string
+}
+
 /** Data-only menu action accepted by the shared context-menu service. */
 export interface SessionMenuAction {
   readonly id: string
   readonly label: string
+  /** Official product glyph rendered in the row's 14px icon cell. */
+  readonly icon?: SessionMenuIcon
   readonly run?: () => void | Promise<void>
 }
 
@@ -107,10 +120,17 @@ export interface ClientLocaleLike {
   bind(namespace: string): (key: string) => string
 }
 
-/** Registration options accepted by the renderer's slot service. */
+/**
+ * Registration options accepted by the renderer's slot service.
+ *
+ * An ordinary slot entry is identified by `id`; a keyed slot entry (such as
+ * `contextMenu.icon`, rendered by a data action's `icon.key`) is identified by
+ * `key` instead. Both registration kinds reach the same register call.
+ */
 export interface SlotRegistrationOptions {
   readonly name: string
-  readonly id: string
+  readonly id?: string
+  readonly key?: string
   readonly order?: number
   readonly locale?: string
   readonly inject?: () => Record<string, unknown>
