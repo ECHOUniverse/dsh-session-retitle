@@ -6,6 +6,7 @@ export type RetitleFailureCode =
   | 'input-too-large'
   | 'no-route'
   | 'invalid-output'
+  | 'truncated-output'
   | 'timeout'
   | 'cancelled'
   | 'superseded'
@@ -54,6 +55,7 @@ const failureCodeSchema = z.enum([
   'input-too-large',
   'no-route',
   'invalid-output',
+  'truncated-output',
   'timeout',
   'cancelled',
   'superseded',
@@ -147,7 +149,16 @@ export const RESULT_JSON_SCHEMA: Readonly<Record<string, unknown>> = {
         outcome: { ...OUTCOME_JSON_SCHEMA, const: 'failed' },
         code: {
           type: 'string',
-          enum: ['input-too-large', 'no-route', 'invalid-output', 'timeout', 'cancelled', 'superseded', 'unknown'],
+          enum: [
+            'input-too-large',
+            'no-route',
+            'invalid-output',
+            'truncated-output',
+            'timeout',
+            'cancelled',
+            'superseded',
+            'unknown',
+          ],
         },
         ...ACTUAL_STATE_JSON_SCHEMA,
       },

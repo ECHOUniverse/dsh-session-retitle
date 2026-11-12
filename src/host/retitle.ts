@@ -206,10 +206,20 @@ function restoreUserTitle(
   }
 }
 
+/**
+ * Message fragments of an output-length truncation. The official provider was
+ * configured with a small maxOutputTokens and a reasoning model ran out of
+ * budget before writing any title text, so this is actionable configuration
+ * feedback, not an invalid model answer.
+ */
+const TRUNCATED_OUTPUT_MESSAGES = [
+  'maxOutputTokens',
+  'reached maxOutputTokens',
+] as const
+
 /** Message fragments the official provider/execution modules use for one failure family. */
 const INVALID_OUTPUT_MESSAGES = [
   'title output must contain text only',
-  'title output reached maxOutputTokens',
   'title model produced no text',
   'returned an invalid result',
   'title must be a string',
@@ -235,6 +245,9 @@ function failureCode(error: unknown, signal: AbortSignal): RetitleFailureCode {
   }
   if (message.includes('maxInputBytes') || /input is \d+ bytes/.test(message)) return 'input-too-large'
   if (message.includes('no logged request route is available')) return 'no-route'
+  // Truncation wins over the invalid-output family: the model never got to
+  // answer, so the user needs the maxOutputTokens hint instead of "invalid title".
+  if (TRUNCATED_OUTPUT_MESSAGES.some((fragment) => message.includes(fragment))) return 'truncated-output'
   if (INVALID_OUTPUT_MESSAGES.some((fragment) => message.includes(fragment))) return 'invalid-output'
   if (/supersed/i.test(message)) return 'superseded'
   // A non-caller abort is the official service superseding older work.

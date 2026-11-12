@@ -276,7 +276,7 @@ test('retitle: refresh failures are classified into stable structured codes', as
     [new Error('session-title-llm: input is 5000 bytes, exceeding maxInputBytes 4096'), 'input-too-large'],
     [new Error('session-title-llm: no logged request route is available; configure provider and model together'), 'no-route'],
     [new Error('session-title-llm: title output must contain text only'), 'invalid-output'],
-    [new Error('session-title-llm: title output reached maxOutputTokens'), 'invalid-output'],
+    [new Error('session-title-llm: title output reached maxOutputTokens'), 'truncated-output'],
     [timeoutError, 'timeout'],
     [new Error('explicit title refresh superseded older generation'), 'superseded'],
     [new Error('session-title provider was disposed'), 'unknown'],
@@ -290,6 +290,27 @@ test('retitle: refresh failures are classified into stable structured codes', as
     assert.deepEqual(result, {
       outcome: 'failed',
       code,
+      actualTitle: 'Kept title',
+      actualSourceKind: 'provider',
+    })
+  }
+})
+
+test('retitle: a maxOutputTokens truncation is failed/truncated-output, not invalid-output', async () => {
+  const { retitle } = await import('../lib/host/retitle.js')
+  const messages = [
+    'session-title-llm: title output reached maxOutputTokens',
+    'session-title-llm: title output exceeded maxOutputTokens=64',
+  ]
+  for (const message of messages) {
+    const { deps, agent } = createHarness({
+      before: snapshot('Kept title', { kind: 'provider', provider: 'session-title-all-prompts-llm' }, 3),
+      refreshThrows: new Error(message),
+    })
+    const result = await retitle(deps, agent, {}, new AbortController().signal)
+    assert.deepEqual(result, {
+      outcome: 'failed',
+      code: 'truncated-output',
       actualTitle: 'Kept title',
       actualSourceKind: 'provider',
     })

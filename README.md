@@ -49,7 +49,7 @@
 
 - engines.dsh 固定 0.2.2-rc.2。
 - npm 仅发布 protocol 0.2.2-rc.1，因此构建期使用该纯 descriptor 工厂，运行期 Host 由 DSH 0.2.2-rc.2 解析；用户已批准 rc.1 构建 + rc.2 实测策略。
-- 当前 66 项测试通过，阶段 2 的严格 Remote、冷恢复、零副作用与卸载验证已完成，详见 artifacts/spike-verification.md。
+- 当前 74 项测试通过，阶段 2 的严格 Remote、冷恢复、零副作用与卸载验证已完成，详见 artifacts/spike-verification.md。
 - Desktop/真实 Provider 的最终验收记录见 artifacts/（随集成验证更新）。
 
 ## 已知限制
@@ -57,3 +57,4 @@
 - Provider 清单是点快照，预检与 refresh 之间存在竞态；手动标题补偿不是通用事务回滚。
 - 无标题会话在 Provider 失败后可能保留官方 fallback。
 - 非 owner Peer 的 Remote 资源授权不在首版范围内。
+- 官方 all-prompts Provider 默认 `maxOutputTokens: 64`；推理型模型（如 opencode-go/deepseek-v4.1-flash）可能在产出正文前被截断，表现为间歇失败。本插件会把它单独报告为“输出被截断”，建议在官方标题 Bundle 配置中把 `maxOutputTokens` 提到 512。诊断与实测数据见 [artifacts/bug-invalid-output-diagnosis.md](artifacts/bug-invalid-output-diagnosis.md)。

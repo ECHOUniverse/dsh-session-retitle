@@ -1,3 +1,5 @@
+import type { RetitleFailureCode } from '../shared/result.js'
+
 /**
  * Client-side dictionaries owned by the sessionRetitle locale namespace.
  *
@@ -22,6 +24,7 @@ export const en = {
   'failure.inputTooLarge': 'the conversation text is too long for the title provider',
   'failure.noRoute': 'no model route is available',
   'failure.invalidOutput': 'the provider returned an invalid title',
+  'failure.truncatedOutput': 'the title model output was cut off at the output length limit; raise maxOutputTokens (for example 512) in the official title provider configuration and retry',
   'failure.timeout': 'the request timed out',
   'failure.cancelled': 'the request was cancelled',
   'failure.superseded': 'a newer request replaced this one',
@@ -49,6 +52,7 @@ export const zh = {
   'failure.inputTooLarge': '对话内容超出标题 Provider 的长度上限',
   'failure.noRoute': '没有可用的模型路由',
   'failure.invalidOutput': 'Provider 返回了无效标题',
+  'failure.truncatedOutput': '标题模型输出被输出长度上限截断；请在官方“随对话更新的标题”插件配置中提高 maxOutputTokens（例如 512）后重试',
   'failure.timeout': '请求超时',
   'failure.cancelled': '请求已取消',
   'failure.superseded': '该请求已被更新的请求取代',
@@ -71,8 +75,9 @@ export const FAILURE_REASON_KEYS = {
   'input-too-large': 'failure.inputTooLarge',
   'no-route': 'failure.noRoute',
   'invalid-output': 'failure.invalidOutput',
+  'truncated-output': 'failure.truncatedOutput',
   timeout: 'failure.timeout',
   cancelled: 'failure.cancelled',
   superseded: 'failure.superseded',
   unknown: 'failure.unknown',
-} as const satisfies Readonly<Record<string, LocaleKey>>
+} as const satisfies Readonly<Record<RetitleFailureCode, LocaleKey>>

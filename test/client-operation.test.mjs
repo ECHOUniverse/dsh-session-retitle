@@ -22,6 +22,7 @@ const COPY = {
   'failure.inputTooLarge': 'the conversation text is too long for the title provider',
   'failure.noRoute': 'no model route is available',
   'failure.invalidOutput': 'the provider returned an invalid title',
+  'failure.truncatedOutput': 'the title model output was cut off at the output length limit; raise maxOutputTokens (for example 512) in the official title provider configuration and retry',
   'failure.timeout': 'the request timed out',
   'failure.cancelled': 'the request was cancelled',
   'failure.superseded': 'a newer request replaced this one',
@@ -135,6 +136,7 @@ test('operation: failed results map stable codes to localized reasons', async ()
     { code: 'input-too-large', reason: COPY['failure.inputTooLarge'] },
     { code: 'no-route', reason: COPY['failure.noRoute'] },
     { code: 'invalid-output', reason: COPY['failure.invalidOutput'] },
+    { code: 'truncated-output', reason: COPY['failure.truncatedOutput'] },
     { code: 'timeout', reason: COPY['failure.timeout'] },
     { code: 'unknown', reason: COPY['failure.unknown'] },
   ]

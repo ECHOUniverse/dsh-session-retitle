@@ -17,6 +17,7 @@
     "failure.inputTooLarge": "the conversation text is too long for the title provider",
     "failure.noRoute": "no model route is available",
     "failure.invalidOutput": "the provider returned an invalid title",
+    "failure.truncatedOutput": "the title model output was cut off at the output length limit; raise maxOutputTokens (for example 512) in the official title provider configuration and retry",
     "failure.timeout": "the request timed out",
     "failure.cancelled": "the request was cancelled",
     "failure.superseded": "a newer request replaced this one",

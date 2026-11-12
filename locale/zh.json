@@ -17,6 +17,7 @@
     "failure.inputTooLarge": "对话内容超出标题 Provider 的长度上限",
     "failure.noRoute": "没有可用的模型路由",
     "failure.invalidOutput": "Provider 返回了无效标题",
+    "failure.truncatedOutput": "标题模型输出被输出长度上限截断；请在官方“随对话更新的标题”插件配置中提高 maxOutputTokens（例如 512）后重试",
     "failure.timeout": "请求超时",
     "failure.cancelled": "请求已取消",
     "failure.superseded": "该请求已被更新的请求取代",

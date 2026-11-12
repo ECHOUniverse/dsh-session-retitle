@@ -61,6 +61,12 @@ test('shared descriptor: strict sessionRetitle/execute contract', async () => {
     result.parse({ outcome: 'failed', code: 'no-route', actualTitle: 'Old', actualSourceKind: 'provider' }),
     { outcome: 'failed', code: 'no-route', actualTitle: 'Old', actualSourceKind: 'provider' },
   )
+  // The truncation code is a first-class failed outcome: it must pass the strict schema.
+  assert.deepEqual(
+    result.parse({ outcome: 'failed', code: 'truncated-output', actualTitle: 'Fallback', actualSourceKind: 'fallback' }),
+    { outcome: 'failed', code: 'truncated-output', actualTitle: 'Fallback', actualSourceKind: 'fallback' },
+  )
+  assert.throws(() => result.parse({ outcome: 'failed', code: 'not-a-code' }))
   assert.throws(() => result.parse({ outcome: 'unknown-outcome' }))
   assert.throws(() => result.parse({ outcome: 'no-input', extra: 1 }))
 
