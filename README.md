@@ -19,6 +19,7 @@
 - src/client：Operation、capability、archive、菜单、shell.overlay Modal 与 locale。
 - scripts/build-client.mjs：esbuild 输出单文件 ModuleLoader Client。
 - test：node:test 契约、Host/Client 行为、真实 Cordis 与 jsdom 测试。
+- icon.svg：36×36 透明底插件图标（标题页 + 重生成徽标），48px 卡片框内渲染 36px、行内 30px；设计记录见 [artifacts/plugin-icon.md](artifacts/plugin-icon.md)。
 
 ## 开发
 
