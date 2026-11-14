@@ -1,6 +1,6 @@
 {
   "name": "@hanxu131/dsh-session-retitle",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Regenerate a session title from the session menu through the official all-prompts title provider",
   "type": "module",
   "private": true,
@@ -28,7 +28,7 @@
   "license": "MIT",
   "engines": {
     "node": "^22.19.0 || >=24",
-    "dsh": "0.2.2-rc.2"
+    "dsh": ">=0.2.2-rc.2 <0.3.0-0"
   },
   "dsh": {
     "bundle": {
@@ -47,6 +47,9 @@
       ]
     }
   },
+  "dependencies": {
+    "zod": "4.6.6"
+  },
   "scripts": {
     "build": "npm run build:host && npm run build:client",
     "build:host": "tsc -p tsconfig.host.json",
@@ -57,7 +60,7 @@
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "4.1.0",
-    "@deepseek-ai/dsh-typert-protocol": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.2-rc.3",
     "@types/node": "^24.0.0",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
@@ -65,7 +68,7 @@
     "jsdom": "25.0.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "typescript": "^5.9.3",
-    "zod": "4.6.6"
+    "semver": "^7.8.5",
+    "typescript": "^5.9.3"
   }
 }

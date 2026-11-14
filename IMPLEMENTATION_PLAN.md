@@ -23,6 +23,8 @@
 
 运行版本：@deepseek-ai/dsh / Desktop runtime 0.2.2-rc.2。
 
+> 2026-11-14 更新：运行环境已升级至 DSH `0.2.2-rc.3`，构建期 protocol 升至 `0.2.2-rc.3`，`engines.dsh` 由固定 rc.2 改为范围 `>=0.2.2-rc.2 <0.3.0-0`；本文件其余内容保留为历史记录。
+
 1. refresh(session, signal) 要求 live Session；显式调用会解钉手动标题，后请求取代先请求，陈旧结果不能提交。
 2. Provider 缺失时，refresh() 可走 fallback；手动标题存在合格文本时尤其可能被 fallback 覆盖，因此不能只靠调用后的返回值预防。
 3. Provider 成功生成前可能先落实 fallback；后续失败或取消不会回滚该 fallback。

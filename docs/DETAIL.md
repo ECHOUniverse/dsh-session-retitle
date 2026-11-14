@@ -24,5 +24,5 @@
 - 唯一 Remote：sessionRetitle/execute；无斜杠命令、Agent 工具或 command/run/done 事件。
 - 共享严格 descriptor、Host Retitle 深模块、Client Operation 与自写可访问性 Modal。
 - 菜单项图标使用页面 baseline 模块表里的官方 primitives 刷新字形（keep external，不打包、不新增依赖）。
-- 构建期 protocol 为 npm 可获得的 0.2.2-rc.1，运行环境为 DSH 0.2.2-rc.2；真实 spike 已验证该组合。
-- 75 项单元/契约/真实 Cordis/jsdom 测试通过。
+- 构建期 protocol 为 npm 可获得的 0.2.2-rc.3（npm 现有 rc.1/rc.2/rc.3），运行环境为 DSH 0.2.2-rc.3；engines.dsh 为范围 >=0.2.2-rc.2 <0.3.0-0，rc.3 下真实 spike 已验证该组合。
+- 76 项单元/契约/真实 Cordis/jsdom 测试通过。

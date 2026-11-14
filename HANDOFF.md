@@ -89,6 +89,8 @@ Desktop 会话右键 / 行尾 … → 「重新生成标题」
 
 调查时安装版本：`@deepseek-ai/dsh` / Desktop runtime `0.2.2-rc.2`。下一 session 应先重新核实运行版本，再沿用接口。
 
+> 2026-11-14 更新：安装版本已升至 DSH `0.2.2-rc.3`；插件 `engines.dsh` 由固定 `0.2.2-rc.2` 改为范围 `>=0.2.2-rc.2 <0.3.0-0`，构建期 protocol 升到 `0.2.2-rc.3`。以上调查记录保留为历史，rc.3 复核结论见 artifacts/rc3-compatibility-audit.md。
+
 安装根目录：
 
 `/Applications/DeepSeek Harness.app/Contents/Resources/app.asar/dsh`

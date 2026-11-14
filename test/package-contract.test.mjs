@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { test } from 'node:test'
+import semver from 'semver'
 
 const root = new URL('../', import.meta.url)
 const read = (path) => readFileSync(new URL(path, root), 'utf8')
@@ -19,6 +20,7 @@ test('manifest: standard bundle surface', () => {
     '@deepseek-ai/dsh-client-ui-context-menu',
     '@deepseek-ai/dsh-client-ui-layout',
     '@deepseek-ai/dsh-client-locale',
+    '@deepseek-ai/dsh-client-ui-renderer',
   ]) {
     assert.ok(manifest.dsh.client.inject.includes(entry), `missing client inject: ${entry}`)
   }
@@ -31,6 +33,19 @@ test('manifest: standard bundle surface', () => {
   for (const file of ['lib', 'cordis.patch.yml', 'locale/*.json', 'docs', 'icon.svg']) {
     assert.ok(manifest.files.includes(file), `missing files entry: ${file}`)
   }
+})
+
+test('manifest: engines.dsh accepts the tested DSH rc range', () => {
+  const range = manifest.engines.dsh
+  assert.equal(typeof range, 'string')
+  // A pinned exact version breaks the next rc release; keep a range instead.
+  assert.doesNotMatch(range, /^\d+\.\d+\.\d+(-[\w.-]+)?$/)
+
+  const options = { includePrerelease: true }
+  assert.ok(semver.satisfies('0.2.2-rc.2', range, options), `${range} must accept 0.2.2-rc.2`)
+  assert.ok(semver.satisfies('0.2.2-rc.3', range, options), `${range} must accept 0.2.2-rc.3`)
+  assert.ok(!semver.satisfies('0.3.0-0', range, options), `${range} must reject 0.3.0-0`)
+  assert.ok(!semver.satisfies('0.3.0', range, options), `${range} must reject 0.3.0`)
 })
 
 test('patch: inserts the namespaced bundle row', () => {

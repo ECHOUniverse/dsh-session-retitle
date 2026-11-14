@@ -41,7 +41,7 @@
 ## 安装与使用
 
 1. 先构建并运行完整测试。
-2. 在 Plugins > Add plugin 中选择本目录，或选择生成的 hanxu131-dsh-session-retitle-0.1.0.tgz。
+2. 在 Plugins > Add plugin 中选择本目录，或选择生成的 hanxu131-dsh-session-retitle-0.1.1.tgz。
 3. 启用官方“随对话更新的标题”Bundle 与本插件；必要时重启 DSH。
 4. 在非归档会话菜单选择“重新生成标题”。手动标题会额外要求确认。
 
@@ -49,9 +49,10 @@
 
 ## 版本与验证
 
-- engines.dsh 固定 0.2.2-rc.2。
-- npm 仅发布 protocol 0.2.2-rc.1，因此构建期使用该纯 descriptor 工厂，运行期 Host 由 DSH 0.2.2-rc.2 解析；用户已批准 rc.1 构建 + rc.2 实测策略。
-- 当前 75 项测试通过，阶段 2 的严格 Remote、冷恢复、零副作用与卸载验证已完成，详见 artifacts/spike-verification.md。
+- engines.dsh 为范围 ">=0.2.2-rc.2 <0.3.0-0"：接受 0.2.2-rc.2、0.2.2-rc.3、0.2.2 与 0.2.3，拒绝 0.3.0 及其预发布。
+- 构建期 protocol 使用 npm 已发布的 0.2.2-rc.3（npm 现有 rc.1/rc.2/rc.3）；其 .d.ts 与运行时 JS 和 rc.1 逐字节相同，构建产物不变。
+- 兼容验证（2026-11-14，DSH 0.2.2-rc.3）：typecheck、build 与 76 项测试全部通过；`dsh --profile retitle-spike --dump-config` 不再将本 bundle 记为 incompatible，DSH 自身 `evaluatePluginCompatibility()` 对本 manifest 返回 undefined。审计与验证记录见 [artifacts/rc3-compatibility-audit.md](artifacts/rc3-compatibility-audit.md)。
+- 当前 76 项测试通过，阶段 2 的严格 Remote、冷恢复、零副作用与卸载验证已完成，详见 artifacts/spike-verification.md。
 - Desktop/真实 Provider 的最终验收记录见 artifacts/（随集成验证更新）。
 
 ## 已知限制
