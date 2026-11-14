@@ -7,8 +7,38 @@
 #
 # Local install: Plugins > Add plugin (choose this directory) or
 #   dsh plugin --profile <name> add link:/path/to/regeneratetitle-dsh
+#
+# --- Title provider takeover -------------------------------------------------
+# The official all-prompts provider ships with maxInputBytes: 4096 (about 1300
+# CJK characters) and fails instead of truncating history, so long sessions can
+# never be titled. This bundle disables that row and mounts the same official
+# implementation again below under its own id with raised limits.
+#
+# `disabled` and `config` are separate patch keys: a user profile layer that
+# only overrides the official row's config does NOT re-enable it. Removing this
+# bundle removes the whole overlay, so the official row becomes enabled again
+# with its own config on the next composition (declarative rollback, no
+# cleanup code path involved).
+#
+# Do not manually re-enable the official row while this bundle is installed:
+# both rows would mount the same provider module and the second
+# sessionTitle.register() would fail with a duplicate-provider error.
+- id: optional-session-title-all-prompts
+  disabled: true
+
 - insert:
     - id: session-retitle
       # Quoted because `@` is a reserved YAML indicator.
       name: '@hanxu131/dsh-session-retitle'
       config: {}
+    # Same official implementation, own entry id so exactly one provider mounts.
+    # 32768 bytes covers very long sessions; 512 output tokens leaves room for
+    # reasoning models to emit a title before the cap.
+    - id: session-retitle-all-prompts
+      name: '@deepseek-ai/dsh-session-title-all-prompts-llm'
+      config:
+        targetWords: 5
+        targetCjkCharacters: 10
+        maxInputBytes: 32768
+        maxOutputTokens: 512
+        timeoutMs: 60000
