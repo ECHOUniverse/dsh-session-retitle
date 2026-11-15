@@ -3,7 +3,9 @@
  *
  * Owns the per-session latest-request token and AbortController, the
  * fail-closed provider preflight, the Remote invocation and the manual-title
- * confirmation handshake. The operation is created on the injected child
+ * confirmation handshake. Confirming closes the Modal synchronously; the
+ * confirmed call keeps running in the background and reports its terminal
+ * outcome through a Toast. The operation is created on the injected child
  * fiber, so every Remote access happens in a context that declared it.
  */
 import { checkProviderPreflight, type ProviderPreflight } from './capability.js'
@@ -87,20 +89,25 @@ export class RetitleOperation {
     }
   }
 
-  /** Confirm the pending manual-title replacement. */
+  /**
+   * Confirm the pending manual-title replacement.
+   *
+   * The Modal closes synchronously so the user never waits for generation; the
+   * confirmed call continues in the background. Consuming the pending
+   * confirmation here is the double-submit guard: a second confirm() has
+   * nothing left to confirm and cannot issue another call.
+   */
   confirm(): void {
     const pending = this.pending
-    if (pending === null) return
+    if (pending === null || !this.modal.getSnapshot().open) return
     const active = this.current.get(pending.sessionId)
     if (active === undefined || active.token !== pending.token || active.controller.signal.aborted) {
       this.pending = null
       this.modal.close()
       return
     }
-    const state = this.modal.getSnapshot()
-    // Double-submit guard: only one confirmation call may be in flight.
-    if (!state.open || state.busy) return
-    this.modal.setBusy(true)
+    this.pending = null
+    this.modal.close()
     void this.runConfirmation(pending, active.controller)
   }
 
@@ -117,7 +124,6 @@ export class RetitleOperation {
 
   /** Dismiss the pending confirmation without a second call. */
   cancel(): void {
-    if (this.modal.getSnapshot().busy) return
     this.pending = null
     this.modal.close()
   }
@@ -228,16 +234,19 @@ export class RetitleOperation {
   /**
    * Send the confirmed call with the expected manual-title revision, after a
    * fresh fail-closed provider preflight.
+   *
+   * The Modal is already closed, so this only cares whether the owning request
+   * is still live: after an unload or a newer same-session click its late
+   * result stays silent. Feedback still follows the global latest-token rule
+   * through mayReport().
    * @param pending - confirmation the user accepted.
    * @param controller - controller of the owning request.
    */
   private async runConfirmation(pending: PendingConfirmation, controller: AbortController): Promise<void> {
     const preflight = await this.preflight()
-    if (!this.isPending(pending)) return
+    if (!this.isCurrent(pending.token, pending.sessionId)) return
     if (!preflight.ok) {
-      this.finishPending(pending)
-      if (!this.mayReport(pending.token, pending.sessionId)) return
-      this.notifyPreflightFailure(preflight)
+      if (this.mayReport(pending.token, pending.sessionId)) this.notifyPreflightFailure(preflight)
       return
     }
 
@@ -247,46 +256,25 @@ export class RetitleOperation {
         request: { confirmation: { expectedUserTitleEventSeq: pending.eventSeq } },
         signal: controller.signal,
       })
-      if (!this.isPending(pending)) return
+      if (!this.isCurrent(pending.token, pending.sessionId)) return
       if (!result.ok) {
-        this.finishPending(pending)
         if (this.mayReport(pending.token, pending.sessionId)) this.notifyFailed(result.error)
         return
       }
       if (result.value.outcome === 'confirmation-required') {
-        // The manual title changed while the Modal was open: keep the Modal up
-        // with the new revision instead of replacing an unconfirmed title.
-        this.modal.setBusy(false)
-        this.lastModalToken = pending.token
-        this.pending = { ...pending, eventSeq: result.value.eventSeq }
-        this.modal.update({
-          sessionId: pending.sessionId,
-          title: result.value.title,
-          eventSeq: result.value.eventSeq,
-        })
+        // The manual title changed while the confirmed call was in flight.
+        // Never reopen the Modal or overwrite the newer title: tell the user
+        // that this attempt was not applied and to retry.
+        if (this.mayReport(pending.token, pending.sessionId)) {
+          this.notify('toast.manualTitleChanged', false)
+        }
         return
       }
-      this.finishPending(pending)
       this.handleOutcome(pending.token, pending.sessionId, result.value)
     } catch (error) {
-      if (!this.isPending(pending)) return
-      this.finishPending(pending)
+      if (!this.isCurrent(pending.token, pending.sessionId)) return
       if (this.mayReport(pending.token, pending.sessionId)) this.notifyFailed(error)
     }
-  }
-
-  /** Whether this exact confirmation is still the one the user is looking at. */
-  private isPending(pending: PendingConfirmation): boolean {
-    return this.pending === pending
-      && this.isCurrent(pending.token, pending.sessionId)
-      && this.modal.getSnapshot().open
-  }
-
-  /** Close the Modal and stop tracking one confirmation. */
-  private finishPending(pending: PendingConfirmation): void {
-    if (this.pending !== pending) return
-    this.pending = null
-    this.modal.close()
   }
 
   private notifyFailed(error: unknown): void {

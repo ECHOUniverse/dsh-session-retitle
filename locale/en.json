@@ -14,6 +14,7 @@
     "toast.providerCheckFailed": "Could not confirm the official title provider. Please try again.",
     "toast.archived": "This session is archived, so its title was not regenerated.",
     "toast.failed": "Could not regenerate the title: {reason}",
+    "toast.manualTitleChanged": "The manual title changed while the title was being regenerated, so it was not replaced. Please try again.",
     "failure.inputTooLarge": "the conversation text is too long for the title provider",
     "failure.noRoute": "no model route is available",
     "failure.invalidOutput": "the provider returned an invalid title",

@@ -347,6 +347,7 @@ test('operation: a confirmed result is silent once a newer cross-session request
   await runMenuAction(harness, 'session-confirm-stale')
   assert.equal(harness.modalState().open, true)
   harness.modalFace().confirm()
+  assert.equal(harness.modalState().open, false, 'confirm closes the Modal before the background call settles')
   await settle()
   assert.equal(deferred.length, 1)
 

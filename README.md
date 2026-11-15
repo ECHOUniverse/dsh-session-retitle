@@ -8,7 +8,7 @@
 - 菜单项使用官方 UI primitives 的原生刷新图标 `IconRefreshOutlineRegular`，与「重命名」「分叉会话」「归档会话」等条目同风格。
 - 插件自有 sessionRetitle/execute Typert Remote；无斜杠命令、Agent 工具或 command/run/done 事件。
 - 冷会话通过官方 agent lookup 恢复，Provider 每次执行前 fail-closed 预检。
-- 手动标题经阻塞式 Modal 确认，并用 eventSeq 防止覆盖确认期间的新标题。
+- 手动标题经阻塞式 Modal 确认，并用 eventSeq 防止覆盖确认期间的新标题；确认后弹窗立即关闭，生成在后台完成，结果用 Toast 反馈。
 - 同会话最新请求获胜，支持取消、卸载清理、中英文反馈。
 - 仅接受 session-title-all-prompts-llm 的成功结果；手动标题落 fallback 时用公开 rename() 补偿。
 

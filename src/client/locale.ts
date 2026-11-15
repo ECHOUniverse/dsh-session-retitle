@@ -21,6 +21,8 @@ export const en = {
   'toast.providerCheckFailed': 'Could not confirm the official title provider. Please try again.',
   'toast.archived': 'This session is archived, so its title was not regenerated.',
   'toast.failed': 'Could not regenerate the title: {reason}',
+  'toast.manualTitleChanged':
+    'The manual title changed while the title was being regenerated, so it was not replaced. Please try again.',
   'failure.inputTooLarge': 'the conversation text is too long for the title provider',
   'failure.noRoute': 'no model route is available',
   'failure.invalidOutput': 'the provider returned an invalid title',
@@ -49,6 +51,7 @@ export const zh = {
   'toast.providerCheckFailed': '无法确认官方标题 Provider 状态，请重试。',
   'toast.archived': '该会话已归档，未重新生成标题。',
   'toast.failed': '重新生成标题失败：{reason}',
+  'toast.manualTitleChanged': '生成过程中手动标题已被修改，本次未替换，请重试。',
   'failure.inputTooLarge': '对话内容超出标题 Provider 的长度上限',
   'failure.noRoute': '没有可用的模型路由',
   'failure.invalidOutput': 'Provider 返回了无效标题',

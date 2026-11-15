@@ -4,10 +4,11 @@
  *
  * The Modal is a self-written React control: the plugin must not import
  * internal Harness primitives, so dialog semantics (role, aria wiring, focus
- * containment, Escape, focus restoration and double-submit prevention) are
- * implemented here with plain DOM APIs. The state lives in
- * SessionRetitleModalStore; confirm/cancel are injected by the operation so
- * the component has no Remote access of its own.
+ * containment, Escape and focus restoration) are implemented here with plain
+ * DOM APIs. The state lives in SessionRetitleModalStore; confirm/cancel are
+ * injected by the operation so the component has no Remote access of its own.
+ * Confirming closes the Modal synchronously and the operation finishes the
+ * replacement in the background, so the dialog only ever renders open/closed.
  */
 import { useEffect, useId, useRef } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
@@ -130,7 +131,7 @@ function ManualTitleDialog({ state, t, confirm, cancel }: ManualTitleDialogProps
       if (event.key === 'Escape') {
         event.preventDefault()
         event.stopPropagation()
-        if (!state.busy) cancel()
+        cancel()
         return
       }
       if (event.key !== 'Tab') return
@@ -160,7 +161,7 @@ function ManualTitleDialog({ state, t, confirm, cancel }: ManualTitleDialogProps
     }
     document.addEventListener('keydown', onKeyDown, true)
     return () => { document.removeEventListener('keydown', onKeyDown, true) }
-  }, [cancel, state.busy])
+  }, [cancel])
 
   return (
     <div style={backdropStyle} data-session-retitle-backdrop>
@@ -170,7 +171,6 @@ function ManualTitleDialog({ state, t, confirm, cancel }: ManualTitleDialogProps
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        aria-busy={state.busy}
         tabIndex={-1}
         style={dialogStyle}
       >
@@ -180,10 +180,10 @@ function ManualTitleDialog({ state, t, confirm, cancel }: ManualTitleDialogProps
         </p>
         <p style={descriptionStyle}>{t('modal.consequence')}</p>
         <div style={footerStyle}>
-          <button ref={cancelRef} type="button" style={buttonStyle} disabled={state.busy} onClick={cancel}>
+          <button ref={cancelRef} type="button" style={buttonStyle} onClick={cancel}>
             {t('modal.cancel')}
           </button>
-          <button type="button" style={dangerStyle} disabled={state.busy} onClick={confirm}>
+          <button type="button" style={dangerStyle} onClick={confirm}>
             {t('modal.confirm')}
           </button>
         </div>

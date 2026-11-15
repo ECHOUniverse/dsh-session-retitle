@@ -2,9 +2,11 @@
  * Manual-title confirmation state for the blocking Modal.
  *
  * The operation owns this store; the overlay component only reads the
- * snapshot and reports confirm/cancel. Keeping the state outside React makes
- * the confirmation state machine testable without a DOM and lets the operation
- * decide who may open or update the Modal.
+ * snapshot and reports confirm/cancel. Confirming closes the Modal at once and
+ * the operation finishes the replacement in the background, so the state is
+ * open/closed only. Keeping the state outside React makes the confirmation
+ * state machine testable without a DOM and lets the operation decide who may
+ * open the Modal.
  */
 /** One pending manual-title confirmation returned by the Host. */
 export interface ManualTitleConfirmation {
@@ -19,7 +21,6 @@ export interface SessionRetitleModalState {
   readonly sessionId: string
   readonly title: string
   readonly eventSeq: number
-  readonly busy: boolean
 }
 
 /** Closed snapshot shared before any confirmation. */
@@ -28,7 +29,6 @@ export const CLOSED_MODAL_STATE: SessionRetitleModalState = Object.freeze({
   sessionId: '',
   title: '',
   eventSeq: 0,
-  busy: false,
 })
 
 /** Selector hook shape provided by the slot framework for a HostObservable source. */
@@ -58,24 +58,9 @@ export class SessionRetitleModalStore {
     return () => { this.listeners.delete(listener) }
   }
 
-  /** Open (or re-target) the Modal for one manual title. */
+  /** Open the Modal for one manual title. */
   open(confirmation: ManualTitleConfirmation): void {
-    this.publish({ open: true, ...confirmation, busy: false })
-  }
-
-  /** Replace the confirmation while keeping the Modal open. */
-  update(confirmation: ManualTitleConfirmation): void {
-    if (!this.snapshot.open) {
-      this.publish({ open: true, ...confirmation, busy: false })
-      return
-    }
-    this.publish({ ...this.snapshot, ...confirmation })
-  }
-
-  /** Mark the confirmation request as in flight (prevents double submit). */
-  setBusy(busy: boolean): void {
-    if (!this.snapshot.open) return
-    this.publish({ ...this.snapshot, busy })
+    this.publish({ open: true, ...confirmation })
   }
 
   /** Close the Modal without any further call. */

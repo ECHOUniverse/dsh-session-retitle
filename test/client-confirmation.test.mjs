@@ -15,6 +15,8 @@ const COPY = {
   'toast.providerUnavailable': 'The official all-prompts title provider is unavailable. Enable it and try again.',
   'toast.providerCheckFailed': 'Could not confirm the official title provider. Please try again.',
   'toast.failed': 'Could not regenerate the title: {reason}',
+  'toast.manualTitleChanged':
+    'The manual title changed while the title was being regenerated, so it was not replaced. Please try again.',
   'failure.unknown': 'an unknown error occurred',
 }
 
@@ -69,7 +71,6 @@ test('confirmation: a manual title opens the Modal instead of toasting', async (
     sessionId: 'session-manual',
     title: 'My manual title',
     eventSeq: 3,
-    busy: false,
   })
 })
 
@@ -96,6 +97,8 @@ test('confirmation: confirm re-checks the provider and sends the expected event 
   assert.equal(harness.calls.length, 1)
 
   harness.modalFace().confirm()
+  // Close first, generate later: the user must not wait for an LLM response.
+  assert.equal(harness.modalState().open, false, 'the Modal closes synchronously on confirm')
   await settle()
 
   assert.equal(harness.inventoryReads.length, 2, 'provider preflight runs again after confirmation')
@@ -103,11 +106,11 @@ test('confirmation: confirm re-checks the provider and sends the expected event 
   assert.deepEqual(harness.calls[1].request, { confirmation: { expectedUserTitleEventSeq: 7 } })
   assert.ok(harness.calls[1].signal instanceof AbortSignal)
   assert.equal(harness.calls[1].signal.aborted, false)
-  assert.equal(harness.modalState().open, false, 'the Modal closes on the terminal outcome')
+  assert.equal(harness.modalState().open, false, 'the Modal stays closed')
   assert.deepEqual(harness.toasts, [{ text: 'Session title regenerated: Confirmed new title', success: true }])
 })
 
-test('confirmation: a changed manual title updates the open Modal instead of closing it', async () => {
+test('confirmation: a manual title changed during generation is reported without reopening the Modal', async () => {
   let calls = 0
   const harness = await setup((call) => {
     calls += 1
@@ -115,18 +118,20 @@ test('confirmation: a changed manual title updates the open Modal instead of clo
     return confirmation('First manual title', 3)
   })
   await start(harness)
+  assert.equal(harness.modalState().open, true)
+
   harness.modalFace().confirm()
+  assert.equal(harness.modalState().open, false, 'the Modal closes synchronously on confirm')
   await settle()
 
   assert.equal(harness.calls.length, 2)
-  assert.deepEqual(harness.modalState(), {
-    open: true,
-    sessionId: 'session-manual',
-    title: 'Renamed while pending',
-    eventSeq: 12,
-    busy: false,
-  })
-  assert.equal(harness.toasts.length, 0)
+  assert.equal(harness.modalState().open, false, 'a changed manual title must not reopen the Modal')
+  assert.equal(harness.modalState().title, '', 'the stale confirmation is not kept in modal state')
+  assert.deepEqual(
+    harness.toasts,
+    [{ text: COPY['toast.manualTitleChanged'], success: false }],
+    'only the non-blocking changed-title notice is shown',
+  )
   assert.equal(calls, 2)
 })
 
@@ -138,6 +143,7 @@ test('confirmation: the provider is re-checked before the confirmed call and fai
   // The provider disappears between the first response and the confirmation.
   harness.setInventory({ ok: true, value: { entries: [] } })
   harness.modalFace().confirm()
+  assert.equal(harness.modalState().open, false, 'the Modal closes synchronously, before the preflight')
   await settle()
 
   assert.equal(harness.inventoryReads.length, 2)
@@ -146,7 +152,7 @@ test('confirmation: the provider is re-checked before the confirmed call and fai
   assert.deepEqual(harness.toasts, [{ text: COPY['toast.providerUnavailable'], success: false }])
 })
 
-test('confirmation: double submit sends exactly one confirmed call', async () => {
+test('confirmation: a single confirm closes the Modal and later repeats cannot send another call', async () => {
   let release
   const secondCall = new Promise((resolve) => { release = resolve })
   const harness = await setup((call) => {
@@ -156,18 +162,18 @@ test('confirmation: double submit sends exactly one confirmed call', async () =>
   await start(harness)
 
   harness.modalFace().confirm()
-  await settle()
-  assert.equal(harness.modalState().busy, true, 'the Modal is marked busy while the call is in flight')
+  assert.equal(harness.modalState().open, false, 'the Modal closes synchronously')
 
   harness.modalFace().confirm()
   harness.modalFace().confirm()
   await settle()
   assert.equal(harness.calls.length, 2, 'repeated confirmation must not issue more calls')
 
-  release(refreshed('Done').then((value) => value))
+  release(refreshed('Done'))
   await settle()
   assert.equal(harness.calls.length, 2)
   assert.equal(harness.modalState().open, false)
+  assert.deepEqual(harness.toasts, [{ text: 'Session title regenerated: Done', success: true }])
 })
 
 test('confirmation: a newer click on the same session closes the pending Modal', async () => {

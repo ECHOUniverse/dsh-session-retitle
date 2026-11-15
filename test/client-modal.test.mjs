@@ -11,6 +11,7 @@ import {
 
 const COPY = {
   'menu.retitle': 'Regenerate title',
+  'toast.refreshed': 'Session title regenerated: {title}',
   'toast.providerUnavailable': 'The official all-prompts title provider is unavailable. Enable it and try again.',
   'toast.providerCheckFailed': 'Could not confirm the official title provider. Please try again.',
   'toast.failed': 'Could not regenerate the title: {reason}',
@@ -214,7 +215,7 @@ test('modal: Escape cancels, closes without a second call and restores focus', a
   }
 })
 
-test('modal: confirm sends one confirmed call and prevents double submission', async () => {
+test('modal: confirm closes the dialog immediately and reports the background result', async () => {
   let releaseSecond
   const secondCall = new Promise((resolve) => { releaseSecond = resolve })
   const env = await setup()
@@ -231,19 +232,17 @@ test('modal: confirm sends one confirmed call and prevents double submission', a
     const confirm = env.buttonByText(COPY['modal.confirm'])
     await env.act(async () => { confirm.click() })
     assert.equal(harness.calls.length, 2)
-    assert.equal(harness.modalState().busy, true)
-    assert.equal(env.dialog().getAttribute('aria-busy'), 'true')
-    assert.equal(env.buttonByText(COPY['modal.confirm']).disabled, true)
-    assert.equal(env.buttonByText(COPY['modal.cancel']).disabled, true)
+    // The dialog is gone before the confirmed call settles: the title is
+    // regenerated in the background and only the final Toast reports it.
+    assert.equal(env.dialog(), null, 'the dialog disappears immediately')
+    assert.equal(harness.modalState().open, false)
+    assert.equal(env.buttonByText(COPY['modal.confirm']), undefined, 'no confirmation control is left to click')
+    assert.deepEqual(harness.toasts, [], 'no interim toast while generation is in flight')
 
-    // A second click and Escape while the confirmed call is in flight are
-    // ignored: the dialogs cannot be dismissed or resubmitted mid-flight.
-    await env.act(async () => {
-      env.buttonByText(COPY['modal.confirm']).click()
-      env.dialog().dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
-    })
-    assert.equal(harness.calls.length, 2)
-    assert.equal(harness.modalState().open, true)
+    // A repeated confirmation request while the background call is in flight
+    // is a no-op: the pending confirmation was already consumed.
+    await env.act(async () => { harness.modalFace().confirm() })
+    assert.equal(harness.calls.length, 2, 'repeated confirmation must not issue another call')
 
     await env.act(async () => {
       releaseSecond({ ok: true, value: { outcome: 'refreshed', title: 'Regenerated', eventSeq: 9, changed: true, source: { kind: 'provider', provider: 'session-title-all-prompts-llm' } } })
@@ -251,6 +250,7 @@ test('modal: confirm sends one confirmed call and prevents double submission', a
     })
     assert.equal(harness.modalState().open, false)
     assert.equal(calls, 2)
+    assert.deepEqual(harness.toasts, [{ text: 'Session title regenerated: Regenerated', success: true }])
   } finally {
     await env.unmount()
   }
